@@ -53,3 +53,51 @@ const jsonFeatures =  fetch(
       });
     })
     .catch((error) => console.error("Error fetching data:", error));
+
+    
+//database connection
+const { createClient } = supabase;
+const supabaseUrl = 'https://maybrgcpydtvnpcuvonw.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1heWJyZ2NweWR0dm5wY3V2b253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzOTM1MDUsImV4cCI6MjA2ODk2OTUwNX0.RpFbcjS5PKFZprYV_ynhRPNaGPFCB32hUKFscVDDGbU';
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+async function querySupabase() {
+    const { data, error } = await supabaseClient
+        .from("open-restaurant-inspections")
+        .select("*")
+        .limit(100);
+
+    if (error) {
+        console.error("Error fetching data:", error);
+    } else {
+        console.log("Data fetched successfully:", data);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    querySupabase();
+});
+
+
+async function queryWithinDistance(point, n = 1000) {
+        const { data, error } = await supabaseClient.rpc(
+          "find_nearest_n_restaurants",
+          {
+            lat: point[1],
+            lon: point[0],
+            n: n,
+          }
+        );
+
+        if (error) {
+          console.error("Error fetching nearest points:", error);
+        } else {
+          console.log("Nearest points fetched successfully:", data);
+          // do other stuff here later...
+        }
+      }
+
+map.on("click", (e) => {
+    const point = [e.lngLat.lng, e.lngLat.lat];
+    queryWithinDistance(point, 1000); 
+});

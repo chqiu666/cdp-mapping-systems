@@ -101,3 +101,94 @@ map.on("click", (e) => {
     const point = [e.lngLat.lng, e.lngLat.lat];
     queryWithinDistance(point, 1000); 
 });
+
+
+// ... 现有代码 ...
+
+// 新增：将 Supabase 查询结果转为 GeoJSON
+function toGeoJSON(data) {
+  return {
+      type: "FeatureCollection",
+      features: data.map(item => ({
+          type: "Feature",
+          geometry: {
+              type: "Point",
+              coordinates: [item.long, item.lat]
+          },
+          properties: {
+              name: item.name,
+              seating_choice: item.seating_choice,
+              dist_meters: item.dist_meters
+          }
+      }))
+  };
+}
+
+// 新增：添加/更新图层
+function addOrUpdateLayer(geojson) {
+  if (map.getSource('inspection-points')) {
+      map.getSource('inspection-points').setData(geojson);
+  } else {
+      map.addSource('inspection-points', {
+          type: 'geojson',
+          data: geojson
+      });
+      map.addLayer({
+          id: 'inspection-points-layer',
+          type: 'circle',
+          source: 'inspection-points',
+          paint: {
+              // 根据分数设置颜色
+              'circle-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['get', 'dist_meters'],
+                  0, '#2ECC40',
+                  500, '#F1C40F',
+                  1000, '#E21216'
+              ],
+              'circle-radius': 6,
+              'circle-stroke-width': 2,
+              'circle-stroke-color': 'white'
+          }
+      });
+
+      // 弹窗
+      map.on('click', 'inspection-points-layer', (e) => {
+          const props = e.features[0].properties;
+          new maplibregl.Popup()
+              .setLngLat(e.features[0].geometry.coordinates)
+              .setHTML(`<b>${props.name}</b><br>Seating: ${props.seating_choice}<br>Distance: ${props.dist_meters.toFixed(1)}m`)
+              .addTo(map);
+      });
+
+      // 鼠标样式
+      map.on('mouseenter', 'inspection-points-layer', () => {
+          map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'inspection-points-layer', () => {
+          map.getCanvas().style.cursor = '';
+      });
+  }
+}
+
+// 修改 queryWithinDistance
+async function queryWithinDistance(point, n = 1000) {
+  const { data, error } = await supabaseClient.rpc(
+      "find_nearest_n_restaurants",
+      {
+          lat: point[1],
+          lon: point[0],
+          n: n,
+      }
+  );
+
+  if (error) {
+      console.error("Error fetching nearest points:", error);
+  } else {
+      const geojson = toGeoJSON(data);
+      addOrUpdateLayer(geojson);
+  }
+}
+
+// 地图点击事件已存在，无需更改

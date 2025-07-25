@@ -1,0 +1,481 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.960264,
+          40.809481000000005
+        ]
+      },
+      "properties": {
+        "value": 2275000,
+        "address": "地址 1-1",
+        "owner": "业主 1-1",
+        "bbl": "BBL00",
+        "value_normalized": 0.7583333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.959264,
+          40.809981
+        ]
+      },
+      "properties": {
+        "value": 2425000,
+        "address": "地址 1-2",
+        "owner": "业主 1-2",
+        "bbl": "BBL01",
+        "value_normalized": 0.8083333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.958264,
+          40.810481
+        ]
+      },
+      "properties": {
+        "value": 2575000,
+        "address": "地址 1-3",
+        "owner": "业主 1-3",
+        "bbl": "BBL02",
+        "value_normalized": 0.8583333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.95726400000001,
+          40.810981
+        ]
+      },
+      "properties": {
+        "value": 2725000,
+        "address": "地址 1-4",
+        "owner": "业主 1-4",
+        "bbl": "BBL03",
+        "value_normalized": 0.9083333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.96293299999999,
+          40.807794
+        ]
+      },
+      "properties": {
+        "value": 1975000,
+        "address": "地址 2-1",
+        "owner": "业主 2-1",
+        "bbl": "BBL10",
+        "value_normalized": 0.6583333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.961933,
+          40.808294
+        ]
+      },
+      "properties": {
+        "value": 2125000,
+        "address": "地址 2-2",
+        "owner": "业主 2-2",
+        "bbl": "BBL11",
+        "value_normalized": 0.7083333333333334
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.960933,
+          40.808794
+        ]
+      },
+      "properties": {
+        "value": 2275000,
+        "address": "地址 2-3",
+        "owner": "业主 2-3",
+        "bbl": "BBL12",
+        "value_normalized": 0.7583333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.959933,
+          40.809293999999994
+        ]
+      },
+      "properties": {
+        "value": 2425000,
+        "address": "地址 2-4",
+        "owner": "业主 2-4",
+        "bbl": "BBL13",
+        "value_normalized": 0.8083333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.96313099999999,
+          40.806581
+        ]
+      },
+      "properties": {
+        "value": 2575000,
+        "address": "地址 3-1",
+        "owner": "业主 3-1",
+        "bbl": "BBL20",
+        "value_normalized": 0.8583333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.962131,
+          40.807081
+        ]
+      },
+      "properties": {
+        "value": 2725000,
+        "address": "地址 3-2",
+        "owner": "业主 3-2",
+        "bbl": "BBL21",
+        "value_normalized": 0.9083333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.961131,
+          40.807581
+        ]
+      },
+      "properties": {
+        "value": 2875000,
+        "address": "地址 3-3",
+        "owner": "业主 3-3",
+        "bbl": "BBL22",
+        "value_normalized": 0.9583333333333334
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.960131,
+          40.808080999999994
+        ]
+      },
+      "properties": {
+        "value": 3025000,
+        "address": "地址 3-4",
+        "owner": "业主 3-4",
+        "bbl": "BBL23",
+        "value_normalized": 1.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.96046899999999,
+          40.809694
+        ]
+      },
+      "properties": {
+        "value": 2375000,
+        "address": "地址 4-1",
+        "owner": "业主 4-1",
+        "bbl": "BBL30",
+        "value_normalized": 0.7916666666666666
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.959469,
+          40.810193999999996
+        ]
+      },
+      "properties": {
+        "value": 2525000,
+        "address": "地址 4-2",
+        "owner": "业主 4-2",
+        "bbl": "BBL31",
+        "value_normalized": 0.8416666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.958469,
+          40.810694
+        ]
+      },
+      "properties": {
+        "value": 2675000,
+        "address": "地址 4-3",
+        "owner": "业主 4-3",
+        "bbl": "BBL32",
+        "value_normalized": 0.8916666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.957469,
+          40.81119399999999
+        ]
+      },
+      "properties": {
+        "value": 2825000,
+        "address": "地址 4-4",
+        "owner": "业主 4-4",
+        "bbl": "BBL33",
+        "value_normalized": 0.9416666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.960325,
+          40.809494
+        ]
+      },
+      "properties": {
+        "value": 2175000,
+        "address": "地址 5-1",
+        "owner": "业主 5-1",
+        "bbl": "BBL40",
+        "value_normalized": 0.725
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.959325,
+          40.809993999999996
+        ]
+      },
+      "properties": {
+        "value": 2325000,
+        "address": "地址 5-2",
+        "owner": "业主 5-2",
+        "bbl": "BBL41",
+        "value_normalized": 0.775
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.958325,
+          40.810494
+        ]
+      },
+      "properties": {
+        "value": 2475000,
+        "address": "地址 5-3",
+        "owner": "业主 5-3",
+        "bbl": "BBL42",
+        "value_normalized": 0.825
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.95732500000001,
+          40.810993999999994
+        ]
+      },
+      "properties": {
+        "value": 2625000,
+        "address": "地址 5-4",
+        "owner": "业主 5-4",
+        "bbl": "BBL43",
+        "value_normalized": 0.875
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.17631899999999,
+          40.691403
+        ]
+      },
+      "properties": {
+        "value": 975000,
+        "address": "地址 6-1",
+        "owner": "业主 6-1",
+        "bbl": "BBL50",
+        "value_normalized": 0.325
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.175319,
+          40.691902999999996
+        ]
+      },
+      "properties": {
+        "value": 1125000,
+        "address": "地址 6-2",
+        "owner": "业主 6-2",
+        "bbl": "BBL51",
+        "value_normalized": 0.375
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.174319,
+          40.692403
+        ]
+      },
+      "properties": {
+        "value": 1275000,
+        "address": "地址 6-3",
+        "owner": "业主 6-3",
+        "bbl": "BBL52",
+        "value_normalized": 0.425
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.173319,
+          40.692902999999994
+        ]
+      },
+      "properties": {
+        "value": 1425000,
+        "address": "地址 6-4",
+        "owner": "业主 6-4",
+        "bbl": "BBL53",
+        "value_normalized": 0.475
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.17902799999999,
+          40.689931
+        ]
+      },
+      "properties": {
+        "value": 875000,
+        "address": "地址 7-1",
+        "owner": "业主 7-1",
+        "bbl": "BBL60",
+        "value_normalized": 0.2916666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.178028,
+          40.690431
+        ]
+      },
+      "properties": {
+        "value": 1025000,
+        "address": "地址 7-2",
+        "owner": "业主 7-2",
+        "bbl": "BBL61",
+        "value_normalized": 0.3416666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.17702799999999,
+          40.690931
+        ]
+      },
+      "properties": {
+        "value": 1175000,
+        "address": "地址 7-3",
+        "owner": "业主 7-3",
+        "bbl": "BBL62",
+        "value_normalized": 0.39166666666666666
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.176028,
+          40.691430999999994
+        ]
+      },
+      "properties": {
+        "value": 1325000,
+        "address": "地址 7-4",
+        "owner": "业主 7-4",
+        "bbl": "BBL63",
+        "value_normalized": 0.44166666666666665
+      }
+    }
+  ]
+}

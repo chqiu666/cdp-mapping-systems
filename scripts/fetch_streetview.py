@@ -20,7 +20,7 @@ NYC_BBOX = {
 
 def generate_random_points_in_bbox(count: int) -> List[Tuple[float, float]]:
     pts: List[Tuple[float, float]] = []
-    for _ in range(count * 2):
+    for _ in range(count * 3):
         lat = random.uniform(NYC_BBOX["min_lat"], NYC_BBOX["max_lat"])
         lng = random.uniform(NYC_BBOX["min_lng"], NYC_BBOX["max_lng"])
         pts.append((lat, lng))
@@ -30,30 +30,37 @@ def generate_random_points_in_bbox(count: int) -> List[Tuple[float, float]]:
 
 def fetch_metadata(lat: float, lng: float, api_key: str) -> Optional[dict]:
     url = "https://maps.googleapis.com/maps/api/streetview/metadata"
-    params = {
-        "location": f"{lat},{lng}",
-        "source": "outdoor",
-        "key": api_key,
-        "radius": 50,
-    }
-    r = requests.get(url, params=params, timeout=20)
-    r.raise_for_status()
-    meta = r.json()
-    if meta.get("status") == "OK":
-        return meta
+    for radius in (50, 100, 200, 300):
+        params = {
+            "location": f"{lat},{lng}",
+            "source": "outdoor",
+            "key": api_key,
+            "radius": radius,
+        }
+        r = requests.get(url, params=params, timeout=20)
+        r.raise_for_status()
+        meta = r.json()
+        if meta.get("status") == "OK":
+            return meta
     return None
 
 
-def download_image(pano_or_latlng: str, out_path: str, api_key: str, size: str = "640x640") -> None:
+def download_image(pano_id: Optional[str], lat: Optional[float], lng: Optional[float], out_path: str, api_key: str, size: str = "640x640") -> None:
     url = "https://maps.googleapis.com/maps/api/streetview"
     params = {
         "size": size,
-        # Per instruction: do not specify heading; keep default pitch 0; source outdoor
-        "location": pano_or_latlng,
+        # Do not specify heading; keep default pitch 0; source outdoor
         "source": "outdoor",
         "pitch": 0,
         "key": api_key,
     }
+    if pano_id:
+        params["pano"] = pano_id
+    elif lat is not None and lng is not None:
+        params["location"] = f"{lat},{lng}"
+    else:
+        raise ValueError("Either pano_id or lat/lng must be provided")
+
     r = requests.get(url, params=params, timeout=60)
     r.raise_for_status()
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -94,14 +101,11 @@ def main() -> None:
         # Save metadata first
         save_json(meta_path, meta)
 
-        # Use pano_id if present; otherwise use actual lat,lng
-        loc = pano_id if pano_id else f"{actual_lat},{actual_lng}"
         try:
-            download_image(loc, img_path, api_key)
+            download_image(pano_id=pano_id, lat=actual_lat, lng=actual_lng, out_path=img_path, api_key=api_key)
             saved += 1
             time.sleep(args.delay)
-        except Exception as e:
-            # Remove metadata if image failed to download
+        except Exception:
             try:
                 os.remove(meta_path)
             except Exception:

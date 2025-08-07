@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deck.gl ArcLayer + Mapbox (Dark)</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    html, body, #map { height: 100%; margin: 0; padding: 0; }
+    .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <script src="https://unpkg.com/deck.gl@8.9.36/dist.min.js"></script>
+  <script src="https://unpkg.com/@deck.gl/mapbox@8.9.36/dist.min.js"></script>
+  <script>
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoiYW5kcmV3OWl1IiwiYSI6ImNtZGk0ejdrZTA5OWQyaXBtdWhlMTdpd2EifQ.SG4pkm1FkJI79DoutAJmrw';
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: [-73.987, 40.748],
+      zoom: 11.5,
+      pitch: 45,
+      bearing: -10
+    });
+
+    fetch('./data/lines.geojson')
+      .then(r => r.json())
+      .then(geo => {
+        const arcs = (geo.features || [])
+          .filter(f => f && f.geometry && f.geometry.type === 'LineString' && Array.isArray(f.geometry.coordinates) && f.geometry.coordinates.length >= 2)
+          .map(f => {
+            const coordinates = f.geometry.coordinates;
+            const start = coordinates[0];
+            const end = coordinates[coordinates.length - 1];
+            return { source: start, target: end };
+          });
+
+        const arcLayer = new deck.ArcLayer({
+          id: 'arc-layer',
+          data: arcs,
+          getSourcePosition: d => d.source,
+          getTargetPosition: d => d.target,
+          getSourceColor: [0, 200, 255, 180],
+          getTargetColor: [255, 140, 0, 180],
+          getWidth: 2,
+          greatCircle: true,
+          pickable: true,
+          autoHighlight: true
+        });
+
+        const overlay = new deck.MapboxOverlay({
+          interleaved: true,
+          layers: [arcLayer]
+        });
+        map.addControl(overlay);
+
+        // Fit bounds to all points
+        const allLngLat = arcs.flatMap(a => [a.source, a.target]);
+        if (allLngLat.length > 0) {
+          const lngs = allLngLat.map(p => p[0]);
+          const lats = allLngLat.map(p => p[1]);
+          const sw = [Math.min(...lngs), Math.min(...lats)];
+          const ne = [Math.max(...lngs), Math.max(...lats)];
+          map.fitBounds([sw, ne], { padding: 60, duration: 1000 });
+        }
+      })
+      .catch(err => console.error('Failed to load GeoJSON', err));
+  </script>
+</body>
+</html>

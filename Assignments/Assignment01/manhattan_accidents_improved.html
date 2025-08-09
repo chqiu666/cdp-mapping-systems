@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manhattan Accidents - Improved (KDE & Grid Density)</title>
+
+  <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    #map {
+      position: absolute;
+      inset: 0;
+    }
+    .control-panel {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 14px rgba(0,0,0,0.15);
+      border-radius: 8px;
+      padding: 12px;
+      width: 320px;
+    }
+    .control-panel h2 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 8px 0;
+      flex-wrap: wrap;
+    }
+    .row label {
+      font-size: 13px;
+      color: #333;
+    }
+    .row .group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    input[type="number"], select {
+      padding: 6px 8px;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .note {
+      font-size: 12px;
+      color: #666;
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 10px;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #333;
+    }
+    .ramp {
+      height: 10px;
+      background: linear-gradient(to right,
+        rgba(33,102,172,0), rgb(103,169,207), rgb(209,229,240),
+        rgb(253,219,199), rgb(239,138,98), rgb(178,24,43)
+      );
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="control-panel">
+    <h2>Manhattan Accidents – KDE & Grid Density</h2>
+    <div class="row">
+      <label><strong>Mode</strong></label>
+      <div class="group">
+        <label><input type="radio" name="mode" value="heatmap" checked /> Heatmap (KDE)</label>
+        <label><input type="radio" name="mode" value="grid" /> Grid density</label>
+      </div>
+    </div>
+
+    <div class="row" id="grid-controls" style="display:none;">
+      <label for="cellSizeKm"><strong>Grid cell size (km)</strong></label>
+      <input id="cellSizeKm" type="number" step="0.1" min="0.1" max="2.0" value="0.5" />
+    </div>
+
+    <div class="row">
+      <label for="hourFilter"><strong>Hour filter</strong></label>
+      <select id="hourFilter">
+        <option value="all">All</option>
+        <option value="0">00</option>
+        <option value="1">01</option>
+        <option value="2">02</option>
+        <option value="3">03</option>
+        <option value="4">04</option>
+        <option value="5">05</option>
+        <option value="6">06</option>
+        <option value="7">07</option>
+        <option value="8">08</option>
+        <option value="9">09</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+        <option value="16">16</option>
+        <option value="17">17</option>
+        <option value="18">18</option>
+        <option value="19">19</option>
+        <option value="20">20</option>
+        <option value="21">21</option>
+        <option value="22">22</option>
+        <option value="23">23</option>
+      </select>
+    </div>
+
+    <div class="legend">
+      <div>Heatmap density</div>
+      <div></div>
+      <div class="ramp"></div>
+      <div>low → high</div>
+    </div>
+
+    <div class="note">
+      不修改旧版页面。本页新增：<strong>热力(KDE)</strong> 和 <strong>网格归一化密度</strong> 两种模式；可按小时筛选。
+      使用 CSV 本地加载，若字段名不同也会自动识别经纬度与时间字段。
+    </div>
+  </div>
+
+  <script>
+    // Manhattan focus
+    const INITIAL_CENTER = [-73.985, 40.75];
+    const INITIAL_ZOOM = 11;
+    const MANHATTAN_BBOX = [-74.10, 40.67, -73.85, 40.90];
+
+    // State
+    let allPointFeatures = [];
+    let detectedKeys = null; // { latKey, lonKey, timeKey, dateKey, boroughKey }
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      center: INITIAL_CENTER,
+      zoom: INITIAL_ZOOM,
+      cooperativeGestures: true
+    });
+
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }));
+
+    const hourFilterSelect = document.getElementById('hourFilter');
+    const cellSizeInput = document.getElementById('cellSizeKm');
+    const gridControls = document.getElementById('grid-controls');
+
+    document.querySelectorAll("input[name='mode']").forEach(el => {
+      el.addEventListener('change', () => {
+        const mode = getMode();
+        gridControls.style.display = mode === 'grid' ? 'flex' : 'none';
+        updateVisualization();
+      });
+    });
+
+    hourFilterSelect.addEventListener('change', () => {
+      updateVisualization();
+    });
+
+    cellSizeInput.addEventListener('change', () => {
+      if (getMode() === 'grid') {
+        updateVisualization();
+      }
+    });
+
+    function getMode() {
+      return document.querySelector("input[name='mode']:checked").value;
+    }
+
+    function isWithinManhattanBbox(lon, lat) {
+      return lon >= MANHATTAN_BBOX[0] && lon <= MANHATTAN_BBOX[2] && lat >= MANHATTAN_BBOX[1] && lat <= MANHATTAN_BBOX[3];
+    }
+
+    function detectRowKeys(row) {
+      if (detectedKeys) return detectedKeys;
+      const keys = Object.keys(row);
+
+      const findKey = (regexes) => keys.find(k => regexes.some(rx => rx.test(k)));
+
+      const latKey = findKey([/^(lat|latitude)$/i, /lat/i]);
+      const lonKey = findKey([/^(lon|lng|long|longitude)$/i, /(lon|lng|long)/i]);
+      const timeKey = findKey([/time/i]);
+      const dateKey = findKey([/date/i]);
+      const boroughKey = findKey([/borough/i, /boro/i]);
+
+      detectedKeys = { latKey, lonKey, timeKey, dateKey, boroughKey };
+      return detectedKeys;
+    }
+
+    function parseHour(row, keys) {
+      const { timeKey, dateKey } = keys;
+      let timeStr = '';
+      if (timeKey && row[timeKey]) {
+        timeStr = String(row[timeKey]).trim();
+      } else if (dateKey && row[dateKey]) {
+        // Try to extract time from datetime
+        const val = String(row[dateKey]);
+        const m = val.match(/(\d{1,2}):(\d{2})/);
+        if (m) timeStr = m[0];
+      }
+      if (!timeStr) return null;
+      const hm = timeStr.split(':');
+      const h = parseInt(hm[0], 10);
+      return Number.isFinite(h) ? Math.max(0, Math.min(23, h)) : null;
+    }
+
+    function rowToFeature(row) {
+      const keys = detectRowKeys(row);
+      const lat = parseFloat(row[keys.latKey]);
+      const lon = parseFloat(row[keys.lonKey]);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      if (!isWithinManhattanBbox(lon, lat)) return null;
+
+      // If borough provided, further restrict to Manhattan if possible
+      if (keys.boroughKey && row[keys.boroughKey]) {
+        const b = String(row[keys.boroughKey]).toLowerCase();
+        if (b && !/manhattan/.test(b)) return null;
+      }
+
+      const hour = parseHour(row, keys);
+      return {
+        type: 'Feature',
+        properties: { hour: hour },
+        geometry: { type: 'Point', coordinates: [lon, lat] }
+      };
+    }
+
+    function getFilteredPointsFeatureCollection() {
+      const selected = hourFilterSelect.value;
+      if (selected === 'all') {
+        return { type: 'FeatureCollection', features: allPointFeatures };
+      }
+      const hour = parseInt(selected, 10);
+      const feats = allPointFeatures.filter(f => f.properties && f.properties.hour === hour);
+      return { type: 'FeatureCollection', features: feats };
+    }
+
+    function ensureSourcesAndLayers() {
+      if (!map.getSource('accidents')) {
+        map.addSource('accidents', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+      }
+      if (!map.getLayer('accidents-heat')) {
+        map.addLayer({
+          id: 'accidents-heat',
+          type: 'heatmap',
+          source: 'accidents',
+          maxzoom: 15,
+          paint: {
+            'heatmap-weight': 1,
+            'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 3],
+            'heatmap-color': [
+              'interpolate', ['linear'], ['heatmap-density'],
+              0, 'rgba(33,102,172,0)',
+              0.2, 'rgb(103,169,207)',
+              0.4, 'rgb(209,229,240)',
+              0.6, 'rgb(253,219,199)',
+              0.8, 'rgb(239,138,98)',
+              1, 'rgb(178,24,43)'
+            ],
+            'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 20, 14, 40],
+            'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 14, 0]
+          }
+        });
+      }
+      if (!map.getLayer('accidents-point')) {
+        map.addLayer({
+          id: 'accidents-point',
+          type: 'circle',
+          source: 'accidents',
+          minzoom: 13,
+          paint: {
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], 13, 2, 17, 6],
+            'circle-color': 'rgba(0,0,0,0.55)',
+            'circle-opacity': 0.6
+          }
+        });
+      }
+
+      if (!map.getSource('grid')) {
+        map.addSource('grid', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+      }
+      if (!map.getLayer('grid-fill')) {
+        map.addLayer({
+          id: 'grid-fill',
+          type: 'fill',
+          source: 'grid',
+          paint: {
+            'fill-color': [
+              'interpolate', ['linear'], ['get', 'density'],
+              0, 'rgba(33,102,172,0)',
+              2, 'rgb(103,169,207)',
+              5, 'rgb(209,229,240)',
+              10, 'rgb(253,219,199)',
+              20, 'rgb(239,138,98)',
+              40, 'rgb(178,24,43)'
+            ],
+            'fill-opacity': 0.6
+          }
+        });
+      }
+      if (!map.getLayer('grid-line')) {
+        map.addLayer({
+          id: 'grid-line',
+          type: 'line',
+          source: 'grid',
+          paint: {
+            'line-color': 'rgba(0,0,0,0.25)',
+            'line-width': 0.5
+          }
+        });
+      }
+    }
+
+    function updateLayerVisibility(mode) {
+      const isGrid = mode === 'grid';
+      const heatVisible = isGrid ? 'none' : 'visible';
+      const gridVisible = isGrid ? 'visible' : 'none';
+
+      if (map.getLayer('accidents-heat')) map.setLayoutProperty('accidents-heat', 'visibility', heatVisible);
+      if (map.getLayer('accidents-point')) map.setLayoutProperty('accidents-point', 'visibility', heatVisible);
+      if (map.getLayer('grid-fill')) map.setLayoutProperty('grid-fill', 'visibility', gridVisible);
+      if (map.getLayer('grid-line')) map.setLayoutProperty('grid-line', 'visibility', gridVisible);
+    }
+
+    function updateHeatmapData() {
+      const fc = getFilteredPointsFeatureCollection();
+      const src = map.getSource('accidents');
+      src.setData(fc);
+    }
+
+    function buildGridFromPoints(cellKm) {
+      const bbox = MANHATTAN_BBOX;
+      const pointsFc = getFilteredPointsFeatureCollection();
+      const grid = turf.squareGrid(bbox, cellKm, { units: 'kilometers' });
+
+      const features = grid.features.map(cell => {
+        const pts = turf.pointsWithinPolygon(pointsFc, cell);
+        const count = pts.features.length;
+        const areaKm2 = turf.area(cell) / 1e6;
+        const density = areaKm2 > 0 ? count / areaKm2 : 0;
+        cell.properties = { count, area_km2: areaKm2, density };
+        return cell;
+      }).filter(f => f.properties.count > 0);
+
+      return { type: 'FeatureCollection', features };
+    }
+
+    function updateGridData() {
+      const cellKm = Math.max(0.1, Math.min(2.0, parseFloat(cellSizeInput.value) || 0.5));
+      const gridFc = buildGridFromPoints(cellKm);
+      const src = map.getSource('grid');
+      src.setData(gridFc);
+    }
+
+    function updateVisualization() {
+      const mode = getMode();
+      updateLayerVisibility(mode);
+      if (mode === 'grid') {
+        updateGridData();
+      } else {
+        updateHeatmapData();
+      }
+    }
+
+    function addOrUpdateHourFilter() {
+      const v = hourFilterSelect.value;
+      if (v === 'all') {
+        // Remove filter
+        if (map.getLayer('accidents-heat')) map.setFilter('accidents-heat', null);
+        if (map.getLayer('accidents-point')) map.setFilter('accidents-point', null);
+        return;
+      }
+      const hour = parseInt(v, 10);
+      const filterExpr = ['==', ['coalesce', ['get', 'hour'], -1], hour];
+      if (map.getLayer('accidents-heat')) map.setFilter('accidents-heat', filterExpr);
+      if (map.getLayer('accidents-point')) map.setFilter('accidents-point', filterExpr);
+    }
+
+    function loadCsvData() {
+      Papa.parse('Motor_Vehicle_Collisions.csv', {
+        download: true,
+        header: true,
+        dynamicTyping: false,
+        worker: true,
+        skipEmptyLines: true,
+        chunk: (results) => {
+          for (const row of results.data) {
+            if (!detectedKeys) detectRowKeys(row);
+            const feat = rowToFeature(row);
+            if (feat) allPointFeatures.push(feat);
+          }
+        },
+        complete: () => {
+          ensureSourcesAndLayers();
+          updateVisualization();
+          addOrUpdateHourFilter();
+        },
+        error: (err) => {
+          console.error('CSV parse error:', err);
+          alert('Failed to load CSV. Please check file path and try again.');
+        }
+      });
+    }
+
+    map.on('load', () => {
+      ensureSourcesAndLayers();
+      updateLayerVisibility(getMode());
+      loadCsvData();
+    });
+  </script>
+</body>
+</html>

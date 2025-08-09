@@ -130,7 +130,7 @@
         <option value="19">19</option>
         <option value="20">20</option>
         <option value="21">21</option>
-        <option value="22">22</option>
+        <option value="22" selected>22</option>
         <option value="23">23</option>
       </select>
     </div>
@@ -143,9 +143,11 @@
     </div>
 
     <div class="note">
-      不修改旧版页面。本页新增：<strong>热力(KDE)</strong> 和 <strong>网格归一化密度</strong> 两种模式；可按小时筛选。
-      使用 CSV 本地加载，若字段名不同也会自动识别经纬度与时间字段。
+      Added:<strong>KDE</strong> and <strong>Grid Normalized Density</strong> 
+      two kinds of mode and able to filtered by <strong>hour</strong>.
+      
     </div>
+    <div id="status" class="note">Loading data...</div>
   </div>
 
   <script>
@@ -274,17 +276,17 @@
           maxzoom: 15,
           paint: {
             'heatmap-weight': 1,
-            'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 3],
+            'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.7, 15, 1.8],
             'heatmap-color': [
-              'interpolate', ['linear'], ['heatmap-density'],
-              0, 'rgba(33,102,172,0)',
-              0.2, 'rgb(103,169,207)',
-              0.4, 'rgb(209,229,240)',
-              0.6, 'rgb(253,219,199)',
-              0.8, 'rgb(239,138,98)',
-              1, 'rgb(178,24,43)'
+              'interpolate', ['exponential', 1.5], ['heatmap-density'],
+              0.0, 'rgba(33,102,172,0)',
+              0.05, 'rgb(103,169,207)',
+              0.15, 'rgb(209,229,240)',
+              0.3, 'rgb(253,219,199)',
+              0.6, 'rgb(239,138,98)',
+              1.0, 'rgb(178,24,43)'
             ],
-            'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 20, 14, 40],
+            'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 1, 9, 14, 14, 24],
             'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 14, 0]
           }
         });
@@ -403,12 +405,18 @@
       if (map.getLayer('accidents-point')) map.setFilter('accidents-point', filterExpr);
     }
 
+    function setStatus(message) {
+      const el = document.getElementById('status');
+      if (el) el.textContent = message;
+    }
+
     function loadCsvData() {
+      let hasPushedToMapOnce = false;
       Papa.parse('Motor_Vehicle_Collisions.csv', {
         download: true,
         header: true,
         dynamicTyping: false,
-        worker: true,
+        worker: false,
         skipEmptyLines: true,
         chunk: (results) => {
           for (const row of results.data) {
@@ -416,14 +424,28 @@
             const feat = rowToFeature(row);
             if (feat) allPointFeatures.push(feat);
           }
+          setStatus(`Parsed points: ${allPointFeatures.length} (loading...)`);
+          if (!hasPushedToMapOnce && allPointFeatures.length > 0) {
+            hasPushedToMapOnce = true;
+            ensureSourcesAndLayers();
+            updateVisualization();
+            addOrUpdateHourFilter();
+          }
         },
         complete: () => {
           ensureSourcesAndLayers();
           updateVisualization();
           addOrUpdateHourFilter();
+          if (allPointFeatures.length === 0) {
+            setStatus('No points found within the Manhattan bounding box. Please check CSV fields and filters.');
+            alert('No points matched within the Manhattan bounding box. Possible reasons:\n1) CSV field names were not recognized\n2) All points fall outside the Manhattan bbox\n3) BOROUGH field exists but is not Manhattan\nSuggestion: temporarily remove the borough filter or relax the bbox to verify the data');
+          } else {
+            setStatus(`Loaded: ${allPointFeatures.length} points`);
+          }
         },
         error: (err) => {
           console.error('CSV parse error:', err);
+          setStatus('CSV load failed');
           alert('Failed to load CSV. Please check file path and try again.');
         }
       });

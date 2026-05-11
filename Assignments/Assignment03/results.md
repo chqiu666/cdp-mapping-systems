@@ -1,6 +1,6 @@
 # Network Location Analysis
 
-<https://chqiu666.github.io/cdp-mapping-systems/Assignments/Assignment03/geojson_mapbox_viewer.html>
+<https://yuhangchill.github.io/cdp-mapping-systems/Assignments/Assignment03/geojson_mapbox_viewer.html>
 
 ### Beginning
 I wanted to compare YouTube's famous network fusion with cdn, compare Twitter with its decentralized version.

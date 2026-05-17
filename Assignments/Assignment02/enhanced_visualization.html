@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>照片位置 vs NYC地价和土地利用数据</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        
+        .legend {
+            background-color: white;
+            border-radius: 5px;
+            bottom: 30px;
+            left: 10px;
+            padding: 15px;
+            position: absolute;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            max-width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .legend h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .legend-section {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 50%;
+            border: 1px solid #ccc;
+        }
+        
+        .legend-square {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+        }
+        
+        .controls {
+            background-color: white;
+            border-radius: 5px;
+            top: 10px;
+            left: 10px;
+            padding: 15px;
+            position: absolute;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .control-group {
+            margin-bottom: 12px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        
+        .mapboxgl-popup-content {
+            max-width: 300px;
+            font-size: 12px;
+        }
+        
+        .popup-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .popup-detail {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label>数据层控制</label>
+            <div>
+                <input type="checkbox" id="photos-toggle" checked>
+                <label for="photos-toggle">照片位置点</label>
+            </div>
+            <div>
+                <input type="checkbox" id="property-toggle" checked>
+                <label for="property-toggle">地价数据</label>
+            </div>
+            <div>
+                <input type="checkbox" id="pluto-toggle" checked>
+                <label for="pluto-toggle">PLUTO土地利用</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="legend">
+        <h3>图例说明</h3>
+        
+        <div class="legend-section">
+            <h4>照片位置点</h4>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ff6b6b; width: 20px; height: 20px;"></div>
+                <span>高兴趣 (3+ 张照片)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #4ecdc4; width: 15px; height: 15px;"></div>
+                <span>中兴趣 (2 张照片)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #45b7d1; width: 10px; height: 10px;"></div>
+                <span>低兴趣 (1 张照片)</span>
+            </div>
+        </div>
+        
+        <div class="legend-section">
+            <h4>地价等级</h4>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #d73027;"></div>
+                <span>高价值 (>$1M)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #fc8d59;"></div>
+                <span>中价值 ($500K-$1M)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #91bfdb;"></div>
+                <span>低价值 (<$500K)</span>
+            </div>
+        </div>
+        
+        <div class="legend-section">
+            <h4>土地利用类型</h4>
+            <div class="legend-item">
+                <div class="legend-square" style="background-color: #2b8cbe;"></div>
+                <span>低密度住宅</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-square" style="background-color: #7bccc4;"></div>
+                <span>高密度住宅</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-square" style="background-color: #bae4bc;"></div>
+                <span>混合用途</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-square" style="background-color: #f0f0f0;"></div>
+                <span>其他用途</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYW5kcmV3OWl1IiwiYSI6ImNtZGk0ejdrZTA5OWQyaXBtdWhlMTdpd2EifQ.SG4pkm1FkJI79DoutAJmrw';
+        
+        // 初始化地图
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [-74.068146, 40.7505625],
+            zoom: 12
+        });
+        
+        // 数据
+        const photoData = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-74.174819, 40.692153]}, "properties": {"photo_count": 1, "location_cluster": "40.6922,-74.1748", "interest_level": "low"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.958764, 40.810231]}, "properties": {"photo_count": 2, "location_cluster": "40.8102,-73.9588", "interest_level": "medium"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-74.177528, 40.690681]}, "properties": {"photo_count": 1, "location_cluster": "40.6907,-74.1775", "interest_level": "low"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.961433, 40.808544]}, "properties": {"photo_count": 2, "location_cluster": "40.8085,-73.9614", "interest_level": "medium"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.961631, 40.807331]}, "properties": {"photo_count": 1, "location_cluster": "40.8073,-73.9616", "interest_level": "low"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.958969, 40.810444]}, "properties": {"photo_count": 1, "location_cluster": "40.8104,-73.9590", "interest_level": "low"}}]};
+        const propertyData = {"type": "FeatureCollection", "features": []};
+        const plutoData = {"type": "FeatureCollection", "features": []};
+        
+        map.on('load', function() {
+            console.log('地图加载完成');
+            console.log('照片数据点数:', photoData.features.length);
+            console.log('地价数据点数:', propertyData.features.length);
+            console.log('PLUTO数据点数:', plutoData.features.length);
+            
+            // 添加照片数据源和图层
+            map.addSource('photos', {
+                'type': 'geojson',
+                'data': photoData
+            });
+            
+            // 照片点图层
+            map.addLayer({
+                'id': 'photo-points',
+                'type': 'circle',
+                'source': 'photos',
+                'paint': {
+                    'circle-radius': [
+                        'case',
+                        ['>=', ['get', 'photo_count'], 3], 20,
+                        ['>=', ['get', 'photo_count'], 2], 15,
+                        10
+                    ],
+                    'circle-color': [
+                        'case',
+                        ['>=', ['get', 'photo_count'], 3], '#ff6b6b',
+                        ['>=', ['get', 'photo_count'], 2], '#4ecdc4',
+                        '#45b7d1'
+                    ],
+                    'circle-opacity': 0.8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+            
+            // 添加地价数据源和图层
+            map.addSource('property-values', {
+                'type': 'geojson',
+                'data': propertyData
+            });
+            
+            // 地价点图层
+            map.addLayer({
+                'id': 'property-points',
+                'type': 'circle',
+                'source': 'property-values',
+                'paint': {
+                    'circle-radius': 6,
+                    'circle-color': [
+                        'case',
+                        ['==', ['get', 'value_category'], 'high'], '#d73027',
+                        ['==', ['get', 'value_category'], 'medium'], '#fc8d59',
+                        '#91bfdb'
+                    ],
+                    'circle-opacity': 0.7,
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+            
+            // 添加PLUTO数据源和图层
+            map.addSource('pluto', {
+                'type': 'geojson',
+                'data': plutoData
+            });
+            
+            // PLUTO多边形图层
+            map.addLayer({
+                'id': 'pluto-polygons',
+                'type': 'fill',
+                'source': 'pluto',
+                'paint': {
+                    'fill-color': [
+                        'case',
+                        ['==', ['get', 'color_category'], 'residential_low'], '#2b8cbe',
+                        ['==', ['get', 'color_category'], 'residential_high'], '#7bccc4',
+                        ['==', ['get', 'color_category'], 'mixed_use'], '#bae4bc',
+                        '#f0f0f0'
+                    ],
+                    'fill-opacity': 0.6
+                }
+            });
+            
+            // PLUTO边界图层
+            map.addLayer({
+                'id': 'pluto-borders',
+                'type': 'line',
+                'source': 'pluto',
+                'paint': {
+                    'line-color': '#000000',
+                    'line-width': 0.5,
+                    'line-opacity': 0.8
+                }
+            });
+            
+            // 点击事件 - 照片点
+            map.on('click', 'photo-points', function(e) {
+                const props = e.features[0].properties;
+                const coords = e.features[0].geometry.coordinates;
+                
+                new mapboxgl.Popup()
+                    .setLngLat(coords)
+                    .setHTML(`
+                        <div class="popup-title">📷 照片位置点</div>
+                        <div class="popup-detail"><strong>照片数量:</strong> ${props.photo_count}</div>
+                        <div class="popup-detail"><strong>兴趣等级:</strong> ${props.interest_level}</div>
+                        <div class="popup-detail"><strong>位置:</strong> ${coords[1].toFixed(4)}, ${coords[0].toFixed(4)}</div>
+                    `)
+                    .addTo(map);
+            });
+            
+            // 点击事件 - 地价点
+            map.on('click', 'property-points', function(e) {
+                const props = e.features[0].properties;
+                const coords = e.features[0].geometry.coordinates;
+                
+                new mapboxgl.Popup()
+                    .setLngLat(coords)
+                    .setHTML(`
+                        <div class="popup-title">💰 地价信息</div>
+                        <div class="popup-detail"><strong>评估价值:</strong> $$${props.assessed_value.toLocaleString()}</div>
+                        <div class="popup-detail"><strong>市场价值:</strong> $$${props.market_value.toLocaleString()}</div>
+                        <div class="popup-detail"><strong>地址:</strong> ${props.address}</div>
+                        <div class="popup-detail"><strong>建造年份:</strong> ${props.year_built}</div>
+                        <div class="popup-detail"><strong>区:</strong> ${props.borough}</div>
+                    `)
+                    .addTo(map);
+            });
+            
+            // 点击事件 - PLUTO地块
+            map.on('click', 'pluto-polygons', function(e) {
+                const props = e.features[0].properties;
+                
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(`
+                        <div class="popup-title">🏢 土地利用信息</div>
+                        <div class="popup-detail"><strong>土地利用:</strong> ${props.landuse_description}</div>
+                        <div class="popup-detail"><strong>分区:</strong> ${props.zonedist1}</div>
+                        <div class="popup-detail"><strong>建筑类别:</strong> ${props.bldgclass}</div>
+                        <div class="popup-detail"><strong>建筑面积:</strong> ${props.bldgarea} sq ft</div>
+                        <div class="popup-detail"><strong>土地评估:</strong> $$${props.assessland}</div>
+                    `)
+                    .addTo(map);
+            });
+            
+            // 图层控制
+            document.getElementById('photos-toggle').addEventListener('change', function(e) {
+                const visibility = e.target.checked ? 'visible' : 'none';
+                map.setLayoutProperty('photo-points', 'visibility', visibility);
+            });
+            
+            document.getElementById('property-toggle').addEventListener('change', function(e) {
+                const visibility = e.target.checked ? 'visible' : 'none';
+                map.setLayoutProperty('property-points', 'visibility', visibility);
+            });
+            
+            document.getElementById('pluto-toggle').addEventListener('change', function(e) {
+                const visibility = e.target.checked ? 'visible' : 'none';
+                map.setLayoutProperty('pluto-polygons', 'visibility', visibility);
+                map.setLayoutProperty('pluto-borders', 'visibility', visibility);
+            });
+            
+            // 添加鼠标悬停效果
+            map.on('mouseenter', 'photo-points', function() {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            
+            map.on('mouseleave', 'photo-points', function() {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            map.on('mouseenter', 'property-points', function() {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            
+            map.on('mouseleave', 'property-points', function() {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            map.on('mouseenter', 'pluto-polygons', function() {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            
+            map.on('mouseleave', 'pluto-polygons', function() {
+                map.getCanvas().style.cursor = '';
+            });
+        });
+    </script>
+</body>
+</html>

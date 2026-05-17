@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Photo Locations vs NYC Property Data</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .mapboxgl-popup-content {
+            max-width: 300px;
+        }
+        .legend {
+            background-color: white;
+            border-radius: 3px;
+            bottom: 30px;
+            left: 10px;
+            padding: 10px;
+            position: absolute;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .controls {
+            background-color: white;
+            border-radius: 3px;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            position: absolute;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .control-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="controls">
+        <div class="control-group">
+            <h4>Layer Controls</h4>
+            <label><input type="checkbox" id="photos-toggle" checked> Photo Locations</label><br>
+            <label><input type="checkbox" id="pluto-toggle" checked> Property Data</label>
+        </div>
+        <div class="control-group">
+            <h4>Property Value Filter</h4>
+            <label>Min Value: $<input type="number" id="min-value" value="0" step="10000"></label><br>
+            <label>Max Value: $<input type="number" id="max-value" value="10000000" step="10000"></label><br>
+            <button onclick="filterByValue()">Apply Filter</button>
+        </div>
+    </div>
+    
+    <div class="legend">
+        <h4>Legend</h4>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #FF6B6B;"></div>
+            <span>High Interest (5+ photos)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #4ECDC4;"></div>
+            <span>Medium Interest (2-4 photos)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #45B7D1;"></div>
+            <span>Low Interest (1 photo)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #FFA07A; opacity: 0.6;"></div>
+            <span>Property Boundaries</span>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYW5kcmV3OWl1IiwiYSI6ImNtZGk0ejdrZTA5OWQyaXBtdWhlMTdpd2EifQ.SG4pkm1FkJI79DoutAJmrw';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v11',
+            center: [-74.03219066666666, 40.76989733333333],
+            zoom: 12
+        });
+        
+        // Data
+        const photoData = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-74.174819, 40.692153]}, "properties": {"photo_count": 1, "location_cluster": "40.6922,-74.1748", "interest_level": "low"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.958764, 40.810231]}, "properties": {"photo_count": 2, "location_cluster": "40.8102,-73.9588", "interest_level": "medium"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-74.177528, 40.690681]}, "properties": {"photo_count": 1, "location_cluster": "40.6907,-74.1775", "interest_level": "low"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.961433, 40.808544]}, "properties": {"photo_count": 2, "location_cluster": "40.8085,-73.9614", "interest_level": "medium"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.961631, 40.807331]}, "properties": {"photo_count": 1, "location_cluster": "40.8073,-73.9616", "interest_level": "low"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.958969, 40.810444]}, "properties": {"photo_count": 1, "location_cluster": "40.8104,-73.9590", "interest_level": "low"}}]};
+        const plutoData = {"type": "FeatureCollection", "features": []};
+        
+        map.on('load', () => {
+            // Add photo location data
+            map.addSource('photos', {
+                'type': 'geojson',
+                'data': photoData
+            });
+            
+            // Add PLUTO property data
+            map.addSource('pluto', {
+                'type': 'geojson',
+                'data': plutoData
+            });
+            
+            // Property boundaries layer
+            map.addLayer({
+                'id': 'property-boundaries',
+                'type': 'fill',
+                'source': 'pluto',
+                'paint': {
+                    'fill-color': '#FFA07A',
+                    'fill-opacity': 0.3,
+                    'fill-outline-color': '#FF7F50'
+                }
+            });
+            
+            // Photo locations layer
+            map.addLayer({
+                'id': 'photo-points',
+                'type': 'circle',
+                'source': 'photos',
+                'paint': {
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'photo_count'],
+                        1, 8,
+                        2, 12,
+                        5, 16
+                    ],
+                    'circle-color': [
+                        'case',
+                        ['>=', ['get', 'photo_count'], 5], '#FF6B6B',
+                        ['>=', ['get', 'photo_count'], 2], '#4ECDC4',
+                        '#45B7D1'
+                    ],
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#FFFFFF'
+                }
+            });
+            
+            // Click events for popups
+            map.on('click', 'photo-points', (e) => {
+                const properties = e.features[0].properties;
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(`
+                        <strong>Photo Location</strong><br>
+                        Photos taken: ${properties.photo_count}<br>
+                        Interest level: ${properties.interest_level}<br>
+                        Location: ${properties.location_cluster}
+                    `)
+                    .addTo(map);
+            });
+            
+            map.on('click', 'property-boundaries', (e) => {
+                const properties = e.features[0].properties;
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(`
+                        <strong>Property Information</strong><br>
+                        BBL: ${properties.bbl}<br>
+                        Land Use: ${properties.landuse_description}<br>
+                        Building Class: ${properties.building_class}<br>
+                        Total Value: $$${Number(properties.fullval).toLocaleString() || 'N/A'}<br>
+                        Land Value: $$${Number(properties.avland).toLocaleString() || 'N/A'}<br>
+                        Building Value: $$${Number(properties.avtot).toLocaleString() || 'N/A'}
+                    `)
+                    .addTo(map);
+            });
+            
+            // Hover effects
+            map.on('mouseenter', 'photo-points', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            
+            map.on('mouseleave', 'photo-points', () => {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            map.on('mouseenter', 'property-boundaries', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            
+            map.on('mouseleave', 'property-boundaries', () => {
+                map.getCanvas().style.cursor = '';
+            });
+        });
+        
+        // Layer toggle controls
+        document.getElementById('photos-toggle').addEventListener('change', (e) => {
+            const visibility = e.target.checked ? 'visible' : 'none';
+            map.setLayoutProperty('photo-points', 'visibility', visibility);
+        });
+        
+        document.getElementById('pluto-toggle').addEventListener('change', (e) => {
+            const visibility = e.target.checked ? 'visible' : 'none';
+            map.setLayoutProperty('property-boundaries', 'visibility', visibility);
+        });
+        
+        // Value filter function
+        function filterByValue() {
+            const minVal = document.getElementById('min-value').value;
+            const maxVal = document.getElementById('max-value').value;
+            
+            const filter = [
+                'all',
+                ['>=', ['to-number', ['get', 'fullval']], parseFloat(minVal)],
+                ['<=', ['to-number', ['get', 'fullval']], parseFloat(maxVal)]
+            ];
+            
+            map.setFilter('property-boundaries', filter);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.962764,
+          40.808231
+        ]
+      },
+      "properties": {
+        "value": 2100000,
+        "address": "\u793a\u4f8b\u5730\u5740 1-1",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 1-1",
+        "bbl": "\u793a\u4f8bBBL00",
+        "value_normalized": 0.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.960764,
+          40.809231000000004
+        ]
+      },
+      "properties": {
+        "value": 2300000,
+        "address": "\u793a\u4f8b\u5730\u5740 1-2",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 1-2",
+        "bbl": "\u793a\u4f8bBBL01",
+        "value_normalized": 0.7666666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.958764,
+          40.810231
+        ]
+      },
+      "properties": {
+        "value": 2500000,
+        "address": "\u793a\u4f8b\u5730\u5740 1-3",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 1-3",
+        "bbl": "\u793a\u4f8bBBL02",
+        "value_normalized": 0.8333333333333334
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.956764,
+          40.811231
+        ]
+      },
+      "properties": {
+        "value": 2700000,
+        "address": "\u793a\u4f8b\u5730\u5740 1-4",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 1-4",
+        "bbl": "\u793a\u4f8bBBL03",
+        "value_normalized": 0.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.954764,
+          40.812231000000004
+        ]
+      },
+      "properties": {
+        "value": 2900000,
+        "address": "\u793a\u4f8b\u5730\u5740 1-5",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 1-5",
+        "bbl": "\u793a\u4f8bBBL04",
+        "value_normalized": 0.9666666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.965433,
+          40.806543999999995
+        ]
+      },
+      "properties": {
+        "value": 1800000,
+        "address": "\u793a\u4f8b\u5730\u5740 2-1",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 2-1",
+        "bbl": "\u793a\u4f8bBBL10",
+        "value_normalized": 0.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.963433,
+          40.807544
+        ]
+      },
+      "properties": {
+        "value": 2000000,
+        "address": "\u793a\u4f8b\u5730\u5740 2-2",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 2-2",
+        "bbl": "\u793a\u4f8bBBL11",
+        "value_normalized": 0.6666666666666666
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.961433,
+          40.808544
+        ]
+      },
+      "properties": {
+        "value": 2200000,
+        "address": "\u793a\u4f8b\u5730\u5740 2-3",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 2-3",
+        "bbl": "\u793a\u4f8bBBL12",
+        "value_normalized": 0.7333333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.959433,
+          40.809543999999995
+        ]
+      },
+      "properties": {
+        "value": 2400000,
+        "address": "\u793a\u4f8b\u5730\u5740 2-4",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 2-4",
+        "bbl": "\u793a\u4f8bBBL13",
+        "value_normalized": 0.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.957433,
+          40.810544
+        ]
+      },
+      "properties": {
+        "value": 2600000,
+        "address": "\u793a\u4f8b\u5730\u5740 2-5",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 2-5",
+        "bbl": "\u793a\u4f8bBBL14",
+        "value_normalized": 0.8666666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.965631,
+          40.805330999999995
+        ]
+      },
+      "properties": {
+        "value": 2400000,
+        "address": "\u793a\u4f8b\u5730\u5740 3-1",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 3-1",
+        "bbl": "\u793a\u4f8bBBL20",
+        "value_normalized": 0.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.96363099999999,
+          40.806331
+        ]
+      },
+      "properties": {
+        "value": 2600000,
+        "address": "\u793a\u4f8b\u5730\u5740 3-2",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 3-2",
+        "bbl": "\u793a\u4f8bBBL21",
+        "value_normalized": 0.8666666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.961631,
+          40.807331
+        ]
+      },
+      "properties": {
+        "value": 2800000,
+        "address": "\u793a\u4f8b\u5730\u5740 3-3",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 3-3",
+        "bbl": "\u793a\u4f8bBBL22",
+        "value_normalized": 0.9333333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.959631,
+          40.808330999999995
+        ]
+      },
+      "properties": {
+        "value": 3000000,
+        "address": "\u793a\u4f8b\u5730\u5740 3-4",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 3-4",
+        "bbl": "\u793a\u4f8bBBL23",
+        "value_normalized": 1.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.95763099999999,
+          40.809331
+        ]
+      },
+      "properties": {
+        "value": 3200000,
+        "address": "\u793a\u4f8b\u5730\u5740 3-5",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 3-5",
+        "bbl": "\u793a\u4f8bBBL24",
+        "value_normalized": 1.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.178819,
+          40.690152999999995
+        ]
+      },
+      "properties": {
+        "value": 800000,
+        "address": "\u793a\u4f8b\u5730\u5740 4-1",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 4-1",
+        "bbl": "\u793a\u4f8bBBL30",
+        "value_normalized": 0.26666666666666666
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.176819,
+          40.691153
+        ]
+      },
+      "properties": {
+        "value": 1000000,
+        "address": "\u793a\u4f8b\u5730\u5740 4-2",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 4-2",
+        "bbl": "\u793a\u4f8bBBL31",
+        "value_normalized": 0.3333333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.174819,
+          40.692153
+        ]
+      },
+      "properties": {
+        "value": 1200000,
+        "address": "\u793a\u4f8b\u5730\u5740 4-3",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 4-3",
+        "bbl": "\u793a\u4f8bBBL32",
+        "value_normalized": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.172819,
+          40.693152999999995
+        ]
+      },
+      "properties": {
+        "value": 1400000,
+        "address": "\u793a\u4f8b\u5730\u5740 4-4",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 4-4",
+        "bbl": "\u793a\u4f8bBBL33",
+        "value_normalized": 0.4666666666666667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.170819,
+          40.694153
+        ]
+      },
+      "properties": {
+        "value": 1600000,
+        "address": "\u793a\u4f8b\u5730\u5740 4-5",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 4-5",
+        "bbl": "\u793a\u4f8bBBL34",
+        "value_normalized": 0.5333333333333333
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.181528,
+          40.688680999999995
+        ]
+      },
+      "properties": {
+        "value": 700000,
+        "address": "\u793a\u4f8b\u5730\u5740 5-1",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 5-1",
+        "bbl": "\u793a\u4f8bBBL40",
+        "value_normalized": 0.23333333333333334
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.17952799999999,
+          40.689681
+        ]
+      },
+      "properties": {
+        "value": 900000,
+        "address": "\u793a\u4f8b\u5730\u5740 5-2",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 5-2",
+        "bbl": "\u793a\u4f8bBBL41",
+        "value_normalized": 0.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.177528,
+          40.690681
+        ]
+      },
+      "properties": {
+        "value": 1100000,
+        "address": "\u793a\u4f8b\u5730\u5740 5-3",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 5-3",
+        "bbl": "\u793a\u4f8bBBL42",
+        "value_normalized": 0.36666666666666664
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.175528,
+          40.691680999999996
+        ]
+      },
+      "properties": {
+        "value": 1300000,
+        "address": "\u793a\u4f8b\u5730\u5740 5-4",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 5-4",
+        "bbl": "\u793a\u4f8bBBL43",
+        "value_normalized": 0.43333333333333335
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.17352799999999,
+          40.692681
+        ]
+      },
+      "properties": {
+        "value": 1500000,
+        "address": "\u793a\u4f8b\u5730\u5740 5-5",
+        "owner": "\u793a\u4f8b\u4e1a\u4e3b 5-5",
+        "bbl": "\u793a\u4f8bBBL44",
+        "value_normalized": 0.5
+      }
+    }
+  ]
+}

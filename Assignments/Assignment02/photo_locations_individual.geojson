@@ -1,0 +1,125 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.174819,
+          40.692153
+        ]
+      },
+      "properties": {
+        "filename": "CFEE4067-9D71-4FD0-B922-55D4F12923ED.JPG",
+        "date_taken": "2025-06-25T22:55:07",
+        "photo_count": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.958764,
+          40.810231
+        ]
+      },
+      "properties": {
+        "filename": "BD039802-7383-4B6D-B070-72EBA561CEEA.JPG",
+        "date_taken": "2025-06-26T06:57:26",
+        "photo_count": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.177528,
+          40.690681
+        ]
+      },
+      "properties": {
+        "filename": "04218867-D9FB-41B1-B470-6FE434BA7DB2.JPG",
+        "date_taken": "2025-06-26T00:41:53",
+        "photo_count": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.961433,
+          40.808544
+        ]
+      },
+      "properties": {
+        "filename": "6E451AED-2ECB-4C80-9D22-C15074681F78.JPG",
+        "date_taken": "2025-06-26T07:22:35",
+        "photo_count": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.961631,
+          40.807331
+        ]
+      },
+      "properties": {
+        "filename": "817A7415-0587-41C9-BF83-1CC38F540AC3.JPG",
+        "date_taken": "2025-06-26T07:14:16",
+        "photo_count": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.958969,
+          40.810444
+        ]
+      },
+      "properties": {
+        "filename": "CF84815D-E127-4299-9644-3777AA922605.JPG",
+        "date_taken": "2025-06-26T06:59:44",
+        "photo_count": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.958825,
+          40.810244
+        ]
+      },
+      "properties": {
+        "filename": "7733D324-A3B0-4ECB-A5BF-42216C1739E0.JPG",
+        "date_taken": "2025-06-26T06:59:42",
+        "photo_count": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.961403,
+          40.808464
+        ]
+      },
+      "properties": {
+        "filename": "C40DE887-F3D1-4DCC-B664-E82E805E5C24.JPG",
+        "date_taken": "2025-06-26T07:21:29",
+        "photo_count": 1
+      }
+    }
+  ]
+}

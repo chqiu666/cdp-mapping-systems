@@ -1,13 +1,28 @@
-# CDP Mapping Systems Summer 2025
+# Address-to-Place Spaghetti Map (NYC)
 
-Repository for CDP Mapping Systems summer 2025 course
+This project samples Google Street View images in NYC, OCRs text to extract addresses, geocodes them, and visualizes connections (arcs) between where text is seen and where it points to on a Mapbox+deck.gl map.
 
-## Important Links
+## Setup
+- Place API keys in:
+  - `google cloud map platform api key/key.txt`
+  - `mapbox token/token.txt`
+- Install system deps and Python packages:
+  ```bash
+  sudo apt-get update && sudo apt-get install -y tesseract-ocr libtesseract-dev
+  pip install -r requirements.txt
+  ```
 
-- [Syllabus](Syllabus/syllabus.md): this is the source of truth for the course. It contains the schedule, learning objectives, and other important information.
-- [Assignments](Assignments/Assignments.md): this folder contains the descriptions for all assignments in the course. You will submit your assignments here.
-- [Tutorial Notebooks](Tutorials/Tutorials.md): this folder contains the tutorial notebooks for the course. These are the notebooks that we will work through in class.
+## Run pipeline
+```bash
+python scripts/fetch_streetview.py --city NYC --count 40
+python scripts/ocr_and_geocode.py
+python scripts/generate_arcs.py
+```
 
-## Getting started
+The output arcs JSON is written to `website/data/arcs.json`.
 
-Visit the [01. Setting up your environment](Assignments/00_Getting_Started.md) tutorial notebook to set up your programming environment and get started with the course.
+## Run website locally
+```bash
+cd website && python -m http.server 8000
+```
+Then open `http://localhost:8000`.

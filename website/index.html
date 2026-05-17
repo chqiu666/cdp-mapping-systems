@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NYC Address Spaghetti Map</title>
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+    #controls { position: absolute; top: 10px; left: 10px; z-index: 5; background: rgba(255,255,255,0.9); padding: 8px 10px; border-radius: 6px; font-family: sans-serif; }
+    #legend { position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 6px 8px; border-radius: 6px; font-family: sans-serif; }
+  </style>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/deck.gl@8.9.36/dist.min.js"></script>
+</head>
+<body>
+  <div id="controls">
+    <strong>NYC Address Spaghetti Map</strong><br />
+    Visualizing how address text connects to spatial location.
+  </div>
+  <div id="legend">Arc source: Street View pano location. Target: Geocoded address from OCR.</div>
+  <div id="map"></div>
+  <script>
+    async function main() {
+      const tokenResp = await fetch('/token.txt').catch(() => null);
+      let MAPBOX_TOKEN = null;
+      if (tokenResp && tokenResp.ok) {
+        MAPBOX_TOKEN = (await tokenResp.text()).trim();
+      }
+      if (!MAPBOX_TOKEN) {
+        // Fallback to embedded token file path
+        MAPBOX_TOKEN = await fetch('/../mapbox token/token.txt').then(r => r.text()).then(t => t.trim());
+      }
+
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-73.9851, 40.7589],
+        zoom: 11,
+        pitch: 45,
+        bearing: -17.6,
+        antialias: true
+      });
+
+      const arcs = await fetch('data/arcs.json').then(r => r.json()).catch(() => []);
+
+      const deckgl = new deck.DeckGL({
+        canvas: undefined,
+        map: map,
+        layers: [],
+        getTooltip: ({object}) => object ? {
+          text: `${object.addressText || ''}\n${object.formattedAddress || ''}`.trim()
+        } : null
+      });
+
+      function colorByDistance(source, target) {
+        const dx = source[0] - target[0];
+        const dy = source[1] - target[1];
+        const d = Math.sqrt(dx*dx + dy*dy);
+        // Map distance roughly to color
+        const t = Math.min(1, d / 0.2); // 0..~0.2 degrees
+        const r = Math.floor(255 * t);
+        const g = Math.floor(160 * (1 - t));
+        return [r, g, 100, 160];
+      }
+
+      const arcLayer = new deck.ArcLayer({
+        id: 'arcs',
+        data: arcs,
+        pickable: true,
+        getSourcePosition: d => d.sourcePosition,
+        getTargetPosition: d => d.targetPosition,
+        getSourceColor: d => colorByDistance(d.sourcePosition, d.targetPosition),
+        getTargetColor: d => [30, 144, 255, 200],
+        getWidth: 2,
+        greatCircle: true
+      });
+
+      deckgl.setProps({ layers: [arcLayer] });
+    }
+
+    main();
+  </script>
+</body>
+</html>
